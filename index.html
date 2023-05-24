@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <title>Github Private URL Converter</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3 mt-5">
+        <h2 class="text-center">Github Private URL Converter</h2>
+        <div class="input-group mb-3 mt-5">
+          <input type="text" id="githubUrl" class="form-control" placeholder="GitHub URL i.e. https://github.com/username/repo" aria-label="GitHub URL"
+            aria-describedby="convertButton">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="button" id="convertButton">Convert</button>
+          </div>
+        </div>
+        <div class="alert alert-info d-none" id="convertedUrlContainer">
+          <p id="convertedUrl"></p>
+          <button class="btn btn-secondary btn-sm" id="copyButton"><i class="far fa-copy"></i> Copy</button>
+          <span id="copyStatus"></span>
+          <p id="convertedUrlCmd"></p>
+          <button class="btn btn-secondary btn-sm" id="copyButtonCmd"><i class="far fa-copy"></i> Copy</button>
+          <span id="copyStatusCmd"></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 offset-md-3 mt-5 text-left">
+        <p>To add a remote git URL to a local git repo, use the command <code></code><b>git remote set-url &lt;name&gt; &lt;url&gt;</b></code>, where <b>&lt;name&gt;</b> is the name you want to give to the remote and <b>&lt;url&gt;</b> is the URL of the remote repository. This tool helps to convert GitHub URLs to the private URL format that can be used as the <b>&lt;url&gt;</b> parameter when adding a remote.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function () {
+      $('#convertButton').click(function () {
+        var githubUrl = $('#githubUrl').val();
+
+        if(githubUrl.includes("@")){
+          alert("Invalid URL!");
+          return;
+        }
+
+        var convertedUrl = convertGithubUrl(githubUrl);
+        var command = "git remote set-url origin " + convertedUrl;
+        $('#convertedUrl').text(convertedUrl);
+        $('#convertedUrlCmd').text(command);
+        $('#convertedUrlContainer').removeClass('d-none');
+      });
+
+      $('#copyButton').click(function () {
+        var convertedUrl = $('#convertedUrl').text();
+        copyToClipboard(convertedUrl);
+        $('#copyStatus').text('Copied!');
+      });
+
+      $('#copyButtonCmd').click(function () {
+        var convertedUrl = $('#convertedUrlCmd').text();
+        copyToClipboard(convertedUrl);
+        $('#copyStatusCmd').text('Copied!');
+      });
+
+      function convertGithubUrl(url) {
+        var parts = url.split('/');
+        var protocol = parts[0];
+        var hostname = parts[2]
+        var username = parts[3];
+        var repository = parts[4];
+        var convertedUrl = protocol + '//' + username + '@' + hostname + '/' + username + '/' + repository + '.git';
+        return convertedUrl;
+      }
+
+      function copyToClipboard(text) {
+        var dummyElement = document.createElement('textarea');
+        document.body.appendChild(dummyElement);
+        dummyElement.value = text;
+        dummyElement.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummyElement);
+      }
+    });
+  </script>
+</body>
+
+</html>
